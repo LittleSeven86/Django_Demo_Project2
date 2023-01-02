@@ -6,11 +6,14 @@ from django.shortcuts import render
 def index(request):
     return HttpResponse("欢迎测试开发的大佬们")
 
-def get_projects(request):
-    return HttpResponse("<h1>这是一个项目信息</h1>")
+def get_project(request):
+    return HttpResponse("<h1>获取项目信息</h1>")
 
-def get_projects1(request):
-    return HttpResponse("<h1>这是一个项目信息1</h1>")
+def create_project(request):
+    return HttpResponse("<h1>增加项目信息</h1>")
 
-def get_projects2(request):
-    return HttpResponse("<h1>这是一个项目信息2</h1>")
+def put_project(request):
+    return HttpResponse("<h1>更新项目信息</h1>")
+
+def delete_project(request):
+    return HttpResponse("<h1>删除项目信息</h1>")
