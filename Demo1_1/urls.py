@@ -41,7 +41,7 @@ from projects import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('index/',views.index),
+    path('index/',views.index),
     # path('get_projects/',views.get_projects),
     # path('get_projects/1',views.get_projects1),
     # path('get_projects/2',views.get_projects2),
