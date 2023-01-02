@@ -85,7 +85,7 @@ class ProjectsView(View):
             -第一个参数可以直接传递字段或者嵌套字典的列表
             -默认添加content_type为application/json
         '''
-        return JsonResponse(project_data, json_dumps_params={'ensure_ascii=False'})
+        return JsonResponse(project_data, json_dumps_params={'ensure_ascii':False})
 
     def post(self, request):
         return HttpResponse("<h1>创建项目信息</h1>")
