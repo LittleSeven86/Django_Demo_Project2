@@ -17,3 +17,7 @@ def put_project(request):
 
 def delete_project(request):
     return HttpResponse("<h1>删除项目信息</h1>")
+
+def get_projects(request,pk):
+    return HttpResponse(f"<h1>获取项目{pk}的信息</h1>")
+
