@@ -135,10 +135,21 @@ class ProjectsView(View):
 
         2、请求体参数
             -json
+                -json格式的参数会存放在body中，一般为字节类型byte
+                -request.body去提取数据
+                -json.loads(request.body)['gender'] 返回python中对数据类型，对数据进行转换(字典、嵌套字典类型)
             -www-form-urlencoded
                 -一般在网页前端中使用表单录入的参数
                 -request.POST返回QueryDict,类似python中的dict类型
-            -file
+            -file(multipart/data)
+                -传递对文本数据 可以使用request.POST进行提取
+                -传递对非文本数据(二进制文件),可以直接使用request.FILES去提取
+                -如果传递纯粹对文件，request.body去提取
+            -请求头参数
+                -第一种方式 直接使用request.headers['key']或者.get['key1']
+                -第二种方式：request.META[HTTP_AUTHORIZATION']
+                    -请求头参数对可以被转化为参数名大写
+                    -去过参数命中含有—，会自动转化为_
         '''
         return HttpResponse("<h1>创建项目信息</h1>")
 

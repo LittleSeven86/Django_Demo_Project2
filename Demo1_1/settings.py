@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'django-insecure-g+r7b#*u8wwoxn$oa7a&8&6p@x)&)6c3z56jboftqp!qc0dkf9
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -71,17 +69,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Demo1_1.wsgi.application'
 
-
+# 指定在全局配置文件setting.py中的DATAVBASES字典里配置需要连接的数据库信息
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
+    # 指定数据库的别名/标签
+    # 指定的是Django默认使用的数据库
     'default': {
+        # 指定当前使用的数据库引擎
+        # django.db.background.mysql\oracle\sqllite3
         'ENGINE': 'django.db.backends.sqlite3',
+        # 指定数据库名称，如果使用的是sqllite3，需要指定sqllite3文件的绝对路径
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME':'mydb',
+        # 'USER':'root',
+        # 'PASSWORD':'123456',
+        # 'PORT':3306,
+        # 'HOST':'127.0.0.1'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -101,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -112,7 +118,6 @@ TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
