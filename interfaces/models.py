@@ -1,8 +1,6 @@
 from django.db import models
 
-# from utils.base_model import BaseModel
-
-from utils import base_model
+from utils.base_model import BaseModel
 
 # from projects.models import Projects
 
@@ -14,9 +12,8 @@ from utils import base_model
     -学生表与课程表，多对多的关系
 '''
 
-
 # class Interfaces(models.Model):
-class Interfaces():
+class Interfaces(BaseModel):
     # id = models.AutoField(primary_key=True, verbose_name='id主键', help_text='id主键')
     name = models.CharField(verbose_name='接口名称', help_text='接口名称', max_length=20, unique=True)
     tester = models.CharField(verbose_name='测试人员', help_text='测试人员', max_length=10)

@@ -1,4 +1,5 @@
 from django.db import models
+from utils.base_model import BaseModel
 
 
 # Create your models here.
@@ -22,7 +23,7 @@ class Animal(models.Model):
     gender = models.BooleanField()
 
 
-class Projects(models.Model):
+class Projects(BaseModel):
     '''
     1、CharField类型必须指定max_length(该字段的最大字节数)
     2、如果需要给一个字段添加唯一约束，可以将unique设置为True，(默认为False)
@@ -47,3 +48,5 @@ class Projects(models.Model):
         # 指定创建为当前数据表设置中文描述信息
         verbose_name = '项目表'
         verbose_name_plural = '项目表'
+        # 添加默认排序功能，通过id进行排序
+        ordering = ['id']
