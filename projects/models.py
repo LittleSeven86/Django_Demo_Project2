@@ -49,4 +49,4 @@ class Projects(BaseModel):
         verbose_name = '项目表'
         verbose_name_plural = '项目表'
         # 添加默认排序功能，通过id进行排序
-        ordering = ['id']
+        ordering = ['ids']
