@@ -6,7 +6,7 @@ from utils.base_model import BaseModel
 
 
 '''
-1、表与表之间有哪些关系？
+1、表与表之间有哪些关系
     -Projects与Interfaces表，一对多关系
     -学生表与学生详细信息表，一对一关系
     -学生表与课程表，多对多的关系

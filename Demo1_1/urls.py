@@ -42,12 +42,11 @@ from projects import urls
         
 '''
 
-
 urlpatterns = [
     # path('admin/', admin.site.urls),
     # re_path(r'^projects/(?P<pk>\w{3})/$',views.get_projects),   # 使用正则表达式进行提取 re_path
     # path('projects/<int:int>/',views.get_projects),  # 类型转换器 相当于只接收int的参数，str一样的道理
     # path('index/',views.index),
     # path('project/',include('projects.urls'))
-    path('',include('projects.urls'))
+    path('', include('projects.urls'))
 ]

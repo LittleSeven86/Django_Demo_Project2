@@ -1,6 +1,8 @@
 import json
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.db import connection
+from .models import Projects
 
 # 在views
 # Create your views here.
@@ -61,65 +63,76 @@ class ProjectsView(View):
         -每一个处理请求的方法，第二个参数必须为HttpRequest对象
     '''
 
-    def get(self, request, pk):
-        # 创建一个项目信息，本质上还是dict格式
-        project_data = {
-            'id': 1,
-            'name': 'xxxx项目',
-            'leader': 'littleseven'
-        }
-        project_data_list = [
-            {
-                'id': 1,
-                'name': 'xxxx项目',
-                'leader': 'littleseven'
-            },
-            {
-                'id': 2,
-                'name': 'yyyy项目',
-                'leader': 'littleseven'
-            },
-            {
-                'id': 3,
-                'name': 'zzzz项目',
-                'leader': 'littleseven'
-            }
-        ]
-        '''
-        HttpResponse
-            -HttpResponse第一个参数为字符串类型（需要返回到前端的字符串数据）
-            -content_type可以指定响应头中的Content-Type参数
-            -status可以指定响应状态码
-        使用json.dumps进行转换
-        json_str = json.dumps(project_data, ensure_ascii=False，status = 201)
-        return HttpResponse(json_str,content_type='application/json')
-        内置的转换方法，对HttpResponse进行转换，ensure_ascii=False 将中文不会转换成乱码
-        '''
-        '''
-        JsonResponse
-            -为HttpResponse子类
-            -用于返回json数据
-            -第一个参数可以直接传递字段或者嵌套字典的列表
-            -默认添加content_type为application/json
-            -默认第一个参数只能为字典，如果为嵌套字典的列表，需要设置safe为False
-        '''
-        '''
-        两种开发模式：
-            -前后端不分离的开发模式
-                -后端如果返回的是一个HTML页面（页面中有填充数据）
-                -后段需控制数据的展示
-                -前后端不分家，耦合严重
-                -返回的是HTML页面，实用性差，适配做得比较差
-                
-            -前后端分离的开发模式
-                -后端如果返回的是数据（json、xml）
-                -当前主流，后端只对数据进行处理，只提供数据
-                -前端效率、页面好不好看，全由前端负责，前后端完全独立
-                -前端发送给json格式，后端返回json，适用性好、拓展性好，适配性好
-        '''
-        return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
+    # def get(self, request, pk):
+    #     # 创建一个项目信息，本质上还是dict格式
+    #     project_data = {
+    #         'id': 1,
+    #         'name': 'xxxx项目',
+    #         'leader': 'littleseven'
+    #     }
 
-    def post(self, request,pk):
+        #     HttpResponse
+        #         -HttpResponse第一个参数为字符串类型（需要返回到前端的字符串数据）
+        #         -content_type可以指定响应头中的Content-Type参数
+        #         -status可以指定响应状态码
+        #      使用json.dumps进行转换,内置的转换方法，对HttpResponse进行转换，ensure_ascii=False 将中文不会转换成乱码
+        # json_str = json.dumps(project_data, ensure_ascii=False,)
+        # print(json_str)
+        # return HttpResponse(json_str, content_type='application/json',status=301)
+        #
+        # project_data_list = [
+        #     {
+        #         'id': 1,
+        #         'name': 'xxxx项目',
+        #         'leader': 'littleseven'
+        #     },
+        #     {
+        #         'id': 2,
+        #         'name': 'yyyy项目',
+        #         'leader': 'littleseven'
+        #     },
+        #     {
+        #         'id': 3,
+        #         'name': 'zzzz项目',
+        #         'leader': 'littleseven'
+        #     }
+        # ]
+        # return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
+
+    #     '''
+    #     JsonResponse
+    #         -为HttpResponse子类
+    #         -用于返回json数据
+    #         -第一个参数可以直接传递字段或者嵌套字典的列表
+    #         -默认添加content_type为application/json
+    #         -默认第一个参数只能为字典，如果为嵌套字典的列表，需要设置safe为False
+    #     '''
+    #     '''
+    #     两种开发模式：
+    #         -前后端不分离的开发模式
+    #             -后端如果返回的是一个HTML页面（页面中有填充数据）
+    #             -后段需控制数据的展示
+    #             -前后端不分家，耦合严重
+    #             -返回的是HTML页面，实用性差，适配做得比较差
+    #
+    #         -前后端分离的开发模式
+    #             -后端如果返回的是数据（json、xml）
+    #             -当前主流，后端只对数据进行处理，只提供数据
+    #             -前端效率、页面好不好看，全由前端负责，前后端完全独立
+    #             -前端发送给json格式，后端返回json，适用性好、拓展性好，适配性好
+    #     '''
+
+    def get(self, request, pk):
+        '''
+        1、创建
+            -方式一：
+        '''
+        obj = Projects(name='在线图书项目', leader='xxx负责人', )
+        obj.save()
+        pass
+        # return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
+
+    def post(self, request, pk):
         '''
         前端参数解析
         1、前端传递参数的方式

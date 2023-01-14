@@ -28,7 +28,8 @@ class Projects(BaseModel):
     1、CharField类型必须指定max_length(该字段的最大字节数)
     2、如果需要给一个字段添加唯一约束，可以将unique设置为True，(默认为False)
     '''
-    ids = models.IntegerField(primary_key=True, verbose_name='项目主键', help_text='项目主键')
+    # ids = models.IntegerField(primary_key=True, verbose_name='项目主键', help_text='项目主键')
+    # id = models.AutoField(primary_key=True, verbose_name='项目主键', help_text='项目主键')
     name = models.CharField(max_length=20, verbose_name='项目名称', help_text='项目名称', unique=True)
     leader = models.CharField(max_length=10, verbose_name='项目负责人', help_text='项目负责人')
     # 3、使用default指定默认值(如果指定默认值后，创建记录时，该字段不传递会使用默认值)
@@ -47,6 +48,6 @@ class Projects(BaseModel):
         db_table = 'tb_projects'
         # 指定创建为当前数据表设置中文描述信息
         verbose_name = '项目表'
-        verbose_name_plural = '项目表'
+        verbose_name_plural = '项目'
         # 添加默认排序功能，通过id进行排序
-        ordering = ['ids']
+        ordering = ['id']
