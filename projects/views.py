@@ -71,33 +71,33 @@ class ProjectsView(View):
     #         'leader': 'littleseven'
     #     }
 
-        #     HttpResponse
-        #         -HttpResponse第一个参数为字符串类型（需要返回到前端的字符串数据）
-        #         -content_type可以指定响应头中的Content-Type参数
-        #         -status可以指定响应状态码
-        #      使用json.dumps进行转换,内置的转换方法，对HttpResponse进行转换，ensure_ascii=False 将中文不会转换成乱码
-        # json_str = json.dumps(project_data, ensure_ascii=False,)
-        # print(json_str)
-        # return HttpResponse(json_str, content_type='application/json',status=301)
-        #
-        # project_data_list = [
-        #     {
-        #         'id': 1,
-        #         'name': 'xxxx项目',
-        #         'leader': 'littleseven'
-        #     },
-        #     {
-        #         'id': 2,
-        #         'name': 'yyyy项目',
-        #         'leader': 'littleseven'
-        #     },
-        #     {
-        #         'id': 3,
-        #         'name': 'zzzz项目',
-        #         'leader': 'littleseven'
-        #     }
-        # ]
-        # return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
+    #     HttpResponse
+    #         -HttpResponse第一个参数为字符串类型（需要返回到前端的字符串数据）
+    #         -content_type可以指定响应头中的Content-Type参数
+    #         -status可以指定响应状态码
+    #      使用json.dumps进行转换,内置的转换方法，对HttpResponse进行转换，ensure_ascii=False 将中文不会转换成乱码
+    # json_str = json.dumps(project_data, ensure_ascii=False,)
+    # print(json_str)
+    # return HttpResponse(json_str, content_type='application/json',status=301)
+    #
+    # project_data_list = [
+    #     {
+    #         'id': 1,
+    #         'name': 'xxxx项目',
+    #         'leader': 'littleseven'
+    #     },
+    #     {
+    #         'id': 2,
+    #         'name': 'yyyy项目',
+    #         'leader': 'littleseven'
+    #     },
+    #     {
+    #         'id': 3,
+    #         'name': 'zzzz项目',
+    #         'leader': 'littleseven'
+    #     }
+    # ]
+    # return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
 
     #     '''
     #     JsonResponse
@@ -126,11 +126,65 @@ class ProjectsView(View):
         '''
         1、创建
             -方式一：
+            -直接使用模型类(字段名1=值1,字段名1=值1,....)，来创建模型类实例
+            -必须使用模型对象/模型实例调用save方法才会执行SQL语句
         '''
-        obj = Projects(name='在线图书项目', leader='xxx负责人', )
-        obj.save()
-        pass
+        # obj = Projects(name='xxx金融项目', leader='xxx负责人', )
+        # obj.save()
+        # pass
+        '''
+            -方式二
+            -使用模型类.objects返回manage对象
+            -manage对象.create(字段名1=值1,字段名1=值1,....)，来创建模型类实例
+            -无须使用模型对象/模型实例调用save方法，会自动执行SQL语句
+            
+        '''
+        # obj = Projects.objects.create(name='xxx222', leader='lemon', )
+        # pass
         # return JsonResponse(project_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
+
+        '''
+        2、读取数据
+            2.1 读取多条数据
+                -读取数据库中所有的数据
+                -可以使用模型类.objects.all()，会将当前模型类对应的数据表中的所有数据读取出来
+                -模型类.objects.all()，返回QuerySet(查询集对象)
+                -QuerySet对象，类似于列表，具有惰性查询的特性('在用数据的时候，才会执行sql语句')
+        '''
+        # qs = Projects.objects.all()
+        # pass
+        '''
+            2.2 读取单条数据    
+                -方式一：
+                -可以使用模型类.objects.get(条件1=值1,。。。)
+                -如果使用指定条件查询结果记录数量=0，会抛出{DoesNotExist}Projects matching query does not exist.异常
+                -如果使用指定条件查询结果记录数量>1，{MultipleObjectsReturned}get() returned more than one Projects -- it returned 3!
+                -最好使用具有唯一约束的条件去查询
+                -如果使用指定条件查询结果记录数量=1，会返回这条记录对应的模型实例对象，可以使用模型对象.字段名去获取响应的字段值
+        '''
+        # obj = Projects.objects.get(id = 5)
+        #
+        # pass
+
+        '''
+                -方式二：
+                -可以使用模型类.objects.filter(条件1=值1,。。。)
+                -如果使用指定条件查询结果记录数量=0，会返回空的QuerySet对象
+                -如果使用指定条件查询结果记录数量>1，将符合条件的模型对象，包裹到QuerySet对象中返回
+                -QuerySet对象，类似于列表，有如下特性：
+                    -支持通过数值(正整数)索引取值
+                    -支持切片操作(正整数)
+                    -获取第一个元素：QuerySet对象.first()
+                    -获取长度：len()函数，QuerySet对象.count()查询
+                    -判断查询集是否为空:QuerySet对象.exists()
+                    -支持迭代操作(for循环，每次循环返回模型对象)
+
+        '''
+        qs = Projects.objects.filter(id = 5)
+
+        pass
+
+
 
     def post(self, request, pk):
         '''

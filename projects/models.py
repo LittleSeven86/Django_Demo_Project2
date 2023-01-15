@@ -51,3 +51,5 @@ class Projects(BaseModel):
         verbose_name_plural = '项目'
         # 添加默认排序功能，通过id进行排序
         ordering = ['id']
+
+
