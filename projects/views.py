@@ -1,7 +1,11 @@
 import json
+
+from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection
+
+from interfaces.models import Interfaces
 from .models import Projects
 
 # 在views
@@ -153,6 +157,14 @@ class ProjectsView(View):
         '''
         # qs = Projects.objects.all()
         # pass
+
+        # 聚合运算
+        # qs = Projects.objects.filter(name__contains='222').aggregate(Count('id'))
+        # pass
+
+        # 分组运算
+        # qs = Projects.objects.values('id').annotate(Count('interfaces'))
+        # pass
         '''
             2.2 读取单条数据    
                 -方式一：
@@ -180,11 +192,43 @@ class ProjectsView(View):
                     -支持迭代操作(for循环，每次循环返回模型对象)
 
         '''
-        qs = Projects.objects.filter(id = 5)
+        # qs = Projects.objects.filter(id = 5)
+        # pass
+        '''
+        ORM框架中，会给每一个模型类中的主键设置一个别名（pk）
+        filter方法支持多种查询类型
+            1）字段名__查询类型=具体值
+            2）字段名__exact=具体值，缩写形式为：字段名=具体值
+            3）字段名__gt：大于、字段名__gte：大于等于
+            4）字段名__lt：小于、字段名_lte：小于等于
+            5）contains：包含
+            6）startswith：以xxx开头
+            7）endswith：以xxx结尾
+            8）isnull：是否为null
+            9）一般在查询类型前添加“i”，代表忽略大小写
 
+        exclude为反向查询，filter方法支持的所有查询类型，都支持
+        '''
+        # qs = Projects.objects.exclude(id= 5)
+        # pass
+
+        '''
+        创建从表数据
+        外键对应的父表如何传递？
+        方式一:
+            1）先获取父表模型对象,查询到
+            2）将获取的父表模型对象以外键字段名作为参数来传递
+        '''
+        project_obj = Projects.objects.get(name='在线图书项目')
+        # interface_obj = Interfaces.objects.create(name='在线图书项目-登录接口',tester='小七',projects=project_obj)
+        # pass
+        '''
+        方式二：
+            1）先获取父表模型对象，进而获取父表数据的id值
+            2）将父表数据的主键id值以外键名_id作为参数来传递
+        '''
+        interface_obj = Interfaces.objects.create(name='在线图书项目-更新接口', tester='小八', projects_id=project_obj.id)
         pass
-
-
 
     def post(self, request, pk):
         '''
