@@ -217,18 +217,52 @@ class ProjectsView(View):
         外键对应的父表如何传递？
         方式一:
             1）先获取父表模型对象,查询到
-            2）将获取的父表模型对象以外键字段名作为参数来传递
+            2）从表主键用获取的父表模型对象和外键字段名作为参数来传递
         '''
-        project_obj = Projects.objects.get(name='在线图书项目')
-        # interface_obj = Interfaces.objects.create(name='在线图书项目-登录接口',tester='小七',projects=project_obj)
+        # project_obj = Projects.objects.get(name='在线图书项目')
+        # interface_obj = Interfaces.objects.create(name='在线图书项目-注册接口',tester='小七',projects=project_obj)
         # pass
         '''
         方式二：
             1）先获取父表模型对象，进而获取父表数据的id值
             2）将父表数据的主键id值以外键名_id作为参数来传递
         '''
-        interface_obj = Interfaces.objects.create(name='在线图书项目-更新接口', tester='小八', projects_id=project_obj.id)
+        # interface_obj = Interfaces.objects.create(name='在线图书项目-更新接口', tester='小八', projects_id=project_obj.id)
+        # pass
+        '''
+        a.通过从表模型对象（已经获取到了），如何获取父表数据？
+            -可以通过从表外键字段先获取父表模型对象
+            -interface_obj.projects，返回父表模型对象
+        '''
+        # interface_obj = Interfaces.objects.get(id__exact= 1)
+        # interface_obj.projects
+        # pass
+        '''
+        b.通过父表模型对象（已经获取到了），如何获取从表数据？
+          django 默认每个主表的对象都有一个是外键的属性，可以通过它来查询到所有属于主表的子表的信息。
+          默认可以通过父表模型对象.从表模型类名小写_set，返回manager对象，可以进一步使用filter进行过滤
+          如果在从表模型类的外键字段指定了related_name参数，那么会使用related_name指定参数作为名称
+          project_obj.interfaces_set.all()
+          
+          在实际项目中，我们使用最多的还是related_name
+          如果你觉得上面的定义比较麻烦的话，你也可以在定义主表的外键的时候，给这个外键定义好一个名称。要用related_name比如在Interfacees表中：
+          projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE,verbose_name='所属项目', help_text='所属项目',related_name = 'project_interface')
+          那么实现以上的需求，就可以使用projects.interfaces_set.all()
+          也可以使用project.project_interface.all()
+        '''
+        project_obj = Projects.objects.get(id__exact=5)
+        project_obj.interfaces_set.all()
         pass
+
+        '''
+        如果想要通过父表参数来获取从表数据、想要通过从表参数获取父表数据  --- 关联查询
+        可以使用关联查询语句：
+        关联字段名称__关联模型类中的字段名称__查询类型
+        '''
+        # Projects.objects.filter(interfaces__name__iexact='在线图书项目-登录接口')
+        # Interfaces.objects.filter(projects__id__gt= 3)
+        # pass
+
 
     def post(self, request, pk):
         '''
