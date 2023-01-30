@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection
@@ -250,9 +250,9 @@ class ProjectsView(View):
           那么实现以上的需求，就可以使用projects.interfaces_set.all()
           也可以使用project.project_interface.all()
         '''
-        project_obj = Projects.objects.get(id__exact=5)
-        project_obj.interfaces_set.all()
-        pass
+        # project_obj = Projects.objects.get(id__exact=5)
+        # project_obj.interfaces_set.all()
+        # pass
 
         '''
         如果想要通过父表参数来获取从表数据、想要通过从表参数获取父表数据  --- 关联查询
@@ -263,6 +263,65 @@ class ProjectsView(View):
         # Interfaces.objects.filter(projects__id__gt= 3)
         # pass
 
+        '''
+        逻辑查询
+        与关系
+        方式一：
+          在同一个filter方法内部，添加多个关键字参数，那么每个条件为“与”的关系
+        方式二：
+          可以多次调用filter方法，那么filter方法的条件为“与”的关系  --- QuerySet链式调用特性
+        '''
+        # qs = Projects.objects.filter(name__contains='22',leader='lemon')
+        # qs1 = Projects.objects.filter(name__contains='xxx').filter(leader='lemon')
+        # pass
+
+        '''
+        或关系
+          可以使可以使用Q查询，实现逻辑关系，多个Q对象之间如果使用“|”，那么为“或”关系
+        '''
+        # qs = Projects.objects.filter(Q(name__contains='xxx')|Q(leader='lemon'))
+        # pass
+
+        '''
+        排序（QuerySet）
+            可以使用QuerySet对象（manager对象）.order_by('字段名1', '字段名2', '-字段名3')
+            默认为ASC升序，可以在字段名称前添加“-”，那么为DESC降序
+        '''
+        # Projects.objects.filter(Q(name__contains='xxx')|Q(leader='lemon')).order_by('name')
+        # pass
+
+        '''
+        三、更新（U）
+        方式一：一条数据
+            1）必须调用save方法才会执行sql语句，并且默认进行完整更新
+            2）可以在save方法中设置update_fields参数（序列类型），指定需要更新的字段名称（字符串），将指定字段存入列表中
+        '''
+        # project_obj = Projects.objects.get(id__exact=5)
+        # project_obj.name = '在线图书项目（一期）'
+        # project_obj.leader = '小七'
+        # project_obj.save(update_fields=['name','leader'])
+
+        '''
+        方式二：多条数据
+            可以在QuerySet对象.update(字段名称='字段值')，返回修改成功的值，无需调用save方法
+        '''
+        # qs = Projects.objects.filter(name__contains='x').update(leader = '老八')
+        # pass
+
+        '''
+        四、删除（D）
+        删除一条数据
+            先获取到模型对象，然后调用delete方法进行删除
+            
+        删除多条数据
+            先获取查询集，然后调用delete方法进行删除
+            
+        '''
+        project_obj = Projects.objects.get(id__exact=10).delete()
+        pass
+
+        project_obj = Projects.objects.filter(name__contains='xx').delete()
+        pass
 
     def post(self, request, pk):
         '''
