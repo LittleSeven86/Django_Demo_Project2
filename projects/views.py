@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db import connection
@@ -179,18 +179,17 @@ class ProjectsView(View):
         # pass
 
         '''
-                -方式二：
-                -可以使用模型类.objects.filter(条件1=值1,。。。)
-                -如果使用指定条件查询结果记录数量=0，会返回空的QuerySet对象
-                -如果使用指定条件查询结果记录数量>1，将符合条件的模型对象，包裹到QuerySet对象中返回
-                -QuerySet对象，类似于列表，有如下特性：
-                    -支持通过数值(正整数)索引取值
-                    -支持切片操作(正整数)
-                    -获取第一个元素：QuerySet对象.first()
-                    -获取长度：len()函数，QuerySet对象.count()查询
-                    -判断查询集是否为空:QuerySet对象.exists()
-                    -支持迭代操作(for循环，每次循环返回模型对象)
-
+        -方式二：
+        -可以使用模型类.objects.filter(条件1=值1,。。。)
+        -如果使用指定条件查询结果记录数量=0，会返回空的QuerySet对象
+        -如果使用指定条件查询结果记录数量>1，将符合条件的模型对象，包裹到QuerySet对象中返回
+        -QuerySet对象，类似于列表，有如下特性：
+            -支持通过数值(正整数)索引取值
+            -支持切片操作(正整数)
+            -获取第一个元素：QuerySet对象.first()
+            -获取长度：len()函数，QuerySet对象.count()查询
+            -判断查询集是否为空:QuerySet对象.exists()
+            -支持迭代操作(for循环，每次循环返回模型对象)
         '''
         # qs = Projects.objects.filter(id = 5)
         # pass
@@ -317,11 +316,36 @@ class ProjectsView(View):
             先获取查询集，然后调用delete方法进行删除
             
         '''
-        project_obj = Projects.objects.get(id__exact=10).delete()
+        # project_obj = Projects.objects.get(id__exact=10).delete()
+        # pass
+        #
+        # project_obj = Projects.objects.filter(name__contains='xx').delete()
+        # pass
+
+        '''
+        聚合运算
+            -可以使用QuerySet对象.aggregate(聚合函数('字段名'))方法，返回字典数据
+            -返回的字典数据中key为字段名__聚合函数名小写
+            -可以使用关键字参数形式，那么返回的字典数据中key为关键字参数名
+        '''
+        # qs = Projects.objects.filter(name__contains='在').aggregate(Count('id'))
+        # pass
+
+        '''
+        分组查询
+           -可以使用QuerySet对象.values('父表主键id').annotate(聚合函数('从表模型类名小写'))
+            -会自动连接两张表，然后使用外键字段作为分组条件 
+            -如果从表外键设置了related_name，那么就不用使用从表模型类名小写，直接使用从表外键related_name即可
+        '''
+        qs = Projects.objects.values('id').annotate(Count('interfaces_projects'))
         pass
 
-        project_obj = Projects.objects.filter(name__contains='xx').delete()
-        pass
+        '''
+        查询集QuerySet对象有什么特性？
+            -支持链式调用：可以在查询集上多次调用filter、exclude方法
+            -惰性查询：仅仅在使用数据时才会执行sql语句，为了提升数据库读写性能
+            -会执行sql语句的场景：len()、.count()、通过索引取值、print、for
+        '''
 
     def post(self, request, pk):
         '''
@@ -362,3 +386,23 @@ class ProjectsView(View):
 
     def delete(self, request):
         return HttpResponse("<h1>删除项目信息</h1>")
+
+'''
+    需求：
+    1、获取一条项目数据
+      GET /projects/<int:pk>/
+    2、获取所有项目数据
+      GET /projects/
+    3、创建一条项目数据
+      POST /projects/    将项目数据以json的形式来传递
+    4、更新一条项目数据
+      PUT /projects/<int:pk>/   新的项目数据以json的形式来传递
+    5、删除一条项目数据
+      DELETE /projects/<int:pk>/
+'''
+# class ProjectsView(View):
+#     def get(self,request):
+#         '''
+#         功能：获取所有项目数据（查询集），获取列表数据
+#         '''
+#         quueyset = Projects.objects.all()
