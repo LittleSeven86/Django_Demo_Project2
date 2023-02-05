@@ -15,5 +15,6 @@ urlpatterns = [
     # path('delete/',views.delete_project)
     # 定义类试图的路由条目
     # 类型图.as_view() 进行调用
-    path('projects/<int:pk>/',views.ProjectsView.as_view())
+    path('projects/',views.ProjectsView.as_view()),
+    path('projects/<int:pk>/',views.ProjectsDetailView.as_view())
 ]
