@@ -54,4 +54,3 @@ class ProjectSerializer(serializers.Serializer):
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_null=True)
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_blank=True)
     leader = serializers.CharField(label='项目负责人', help_text='项目负责人', default='阿名')
-    pass
