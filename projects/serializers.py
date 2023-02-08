@@ -7,13 +7,13 @@
 
 from rest_framework import serializers
 
-
 '''
 一、序列化器
     a.如果需要使用DRF框架来实现序列化、反列化、数据操作，在子应用中创建serializers.py文件
     b.文件名推荐命名为serializers.py
     
 '''
+
 
 class ProjectSerializer(serializers.Serializer):
     '''
@@ -54,3 +54,4 @@ class ProjectSerializer(serializers.Serializer):
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_null=True)
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_blank=True)
     leader = serializers.CharField(label='项目负责人', help_text='项目负责人', default='阿名')
+    pass
