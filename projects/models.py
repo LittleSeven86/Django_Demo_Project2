@@ -52,4 +52,7 @@ class Projects(BaseModel):
         # 添加默认排序功能，通过id进行排序
         ordering = ['id']
 
+    def __str__(self):
+        return f"Interfaces({self.name})"
+
 

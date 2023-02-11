@@ -6,13 +6,38 @@
 # @Address   ：https://gitee.com/linguchong/Demo1_1.git
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
+from interfaces.models import Interfaces
+from .models import Projects
 
 '''
 一、序列化器
     a.如果需要使用DRF框架来实现序列化、反列化、数据操作，在子应用中创建serializers.py文件
     b.文件名推荐命名为serializers.py
-    
 '''
+
+
+class InterfaceSerilizer(serializers.Serializer):
+    '''
+    1、自定义的序列化器类实际上也是Field的子类
+    2、所以自定义的序列化器类可以作为另一个序列化器中的字段来使用，
+    '''
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    tester = serializers.CharField()
+
+'''
+自定义校验函数
+    1、可以在类外自定义校验函数
+    2、第一个参数为待校验的值
+    3、如果校验不通过，必须得抛出serializers.ValidationError('报错信息')异常，同时可以指定具体的报错信息
+    4、需要将校验函数名放置到validators列表中，调用的时候不用在函数后加括号
+'''
+def is_contains_keyword(value):
+    if '项目' not in value:
+        raise serializers.ValidationError('项目名称中必须得包含“项目”关键字')
+
 
 
 class ProjectSerializer(serializers.Serializer):
@@ -35,22 +60,106 @@ class ProjectSerializer(serializers.Serializer):
         8.如果在序列化器字段中，设置required=False，那么前端用户可以不传递该字段（校验时会忽略改该字段，所以不会报错）
         9.如果未定义模型类中的某个字段，那么该字段不会输入，也不会输出
         10.前端必须的输入（反序列化输入）name（必须得校验），但是不会需要输出（序列化器输出）？
-            如果某个参数指定了write_only=True，那么该字段仅仅只输入（反序列化输入，做数据校验），不会输出（序列化器输出），
-            默认write_only为False
+            如果某个参数指定了write_only=True，那么该字段仅仅只输入（反序列化输入，做数据校验），不会输出（序列化器输出），默认write_only为False
         11.前端可以不用传递，但是后端需要输出？
-            如果某个参数指定了read_only=True，那么该字段仅仅只输出（序列化器输出），不会输入（反序列化输入，做数据校验），
-            默认read_only为False
-        12.在序列化器类中定义的字段，默认allow_null=False，该字段不允许传递null空值，
-            如果指定allow_null=True，那么该字段允许传递null
-        13.在序列化器类中定义CharField字段，默认allow_blank=False，该字段不允许传递空字符串，
-            如果指定allow_blank=True，那么该字段允许传递空字符串
-        14.在序列化器类中定义的字段，可以使用default参数来指定默认值，如果指定了default参数，那么前端用户可以不用传递，
-            会将default指定的值作为入参
+            如果某个参数指定了read_only=True，那么该字段仅仅只输出（序列化器输出），不会输入（反序列化输入，做数据校验），默认read_only为False
+        12.在序列化器类中定义的字段，默认allow_null=False，该字段不允许传递null空值，如果指定allow_null=True，那么该字段允许传递null
+        13.在序列化器类中定义CharField字段，默认allow_blank=False，该字段不允许传递空字符串，如果指定allow_blank=True，那么该字段允许传递空字符串
+        14.在序列化器类中定义的字段，可以使用default参数来指定默认值，如果指定了default参数，那么前端用户可以不用传递，会将default指定的值作为入参
     '''
     # id = serializers.IntegerField(label='项目id', help_text='项目id', max_value=1000, min_value=1)
+
     # name = serializers.CharField(label='项目名称', help_text='项目名称', max_length=20, min_length=5, write_only=True)
+
     # name = serializers.CharField(label='项目名称', help_text='项目名称', max_length=20, min_length=5, read_only=True)
-    name = serializers.CharField(label='项目名称', help_text='项目名称', max_length=20, min_length=5)
+
+    '''
+    validators 指定自定义校验规则
+        1、可以在序列化器字段上使用validators指定自定义的校验规则
+        2、validators必须得为序列类型（列表），在列表中可以添加多个校验规则
+        3、DRF框架自带UniqueValidator校验器，必须得使用queryset指定查询集对象，用于对该字段进行校验
+        4、UniqueValidator校验器，可以使用message指定自定义报错信息
+        5、校验规则的执行顺序？
+            对字段类型进行校验 -> 依次验证validators列表中的校验规则 -> 从右到左依次验证其他规则 -> 调用单字段校验方法 -> 调用多字段联合校验方法validate方法
+    '''
+    name = serializers.CharField(label='项目名称', help_text='项目名称', max_length=20, min_length=5,
+                                 error_messages={
+                                     'min_length': '项目名称不能少于5位',
+                                     'max_length': '项目名称不能超过20位'
+                                 },
+                                 validators=[
+                                     UniqueValidator(queryset=Projects.objects.all(),message='项目名称不能重复'),
+                                     is_contains_keyword,
+
+                                 ])
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_null=True)
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_blank=True)
-    leader = serializers.CharField(label='项目负责人', help_text='项目负责人', default='阿名')
+    leader = serializers.CharField(label='项目负责人', help_text='项目负责人', read_only=True)
+
+    '''
+    自定义错误提示，以及日期格式化输出
+        a.DateTimeField可以使用format参数指定格式化字符串
+        b.可以任意序列化器字段上使用error_messages来自定义错误提示信息
+        c.使用校验选项名（校验方法名）作为key，把具体的错误提示信息作为value
+    '''
+    # update_time = serializers.DateTimeField(label='更新时间', help_text='更新时间', format='%Y年%m月%d日 %H:%M:%S',
+    #                                         error_messages={
+    #                                             'required': '该字段为必传参数'
+    #                                         })
+
+    '''
+    一、关联字段进行查询--使用从表外键
+        1、可以定义PrimaryKeyRelatedField来获取关联表的外键值
+        2、如果通过父获取从表数据，默认需要使用从表模型类名小写_set作为序列化器类中的关联字段名称
+            interfaces_set = serializers.PrimaryKeyRelatedField(label='项目所属接口id',help_text='项目所属接口id',many=True,read_only=True)
+        3、如果在定义模型类的外键字段时，指定了realated_name参数，那么会把realated_name参数名作为序列化器类中的关联字段名称
+        4、PrimaryKeyRelatedField字段，要么指定read_only=True，要么指定queryset参数，否则会报错
+        5、如果指定了read_only=True，那么该字段仅序列化输出
+        6、如果指定了queryset参数（关联表的查询集对象），用于对参数进行校验
+        7、如果关联字段有多个值，那么必须添加many=True，一般父表获取从表数据时，关联字段需要指定
+    '''
+    # inter = serializers.PrimaryKeyRelatedField(label='项目所属接口id', help_text='项目所属接口id',read_only=True,many=True)
+    # inter = serializers.PrimaryKeyRelatedField(label='项目所属接口id', help_text='项目所属接口id', queryset = Interfaces.objects.all(),
+    #                                        many=True,write_only=True)
+    '''
+    关联字段进行查询--使用从表模型类中__str__方法
+        1、使用StringRelatedField字段，将关联字段模型类中的__str__方法的返回值作为该字段的值
+        2、StringRelatedField字段默认添加了read_only=True，该字段仅序列化输出
+    '''
+    # inter = serializers.StringRelatedField(many=True)
+
+    '''
+    关联字段进行查询--使用从表模型类中特定字段进行查询
+        1、使用SlugRelatedField字段，将关联模型类中的某个字段，作为该字段的值
+        2、如果指定了read_only=True，那么该字段仅序列化输出
+        3、如果该字段需要进行反序列化输入，那么必须得指定queryset参数，同时关联字段必须有唯一约束如果该字段需要
+    '''
+    # inter = serializers.SlugRelatedField(slug_field='name', many=True,read_only=True)
+    # inter = serializers.SlugRelatedField(slug_field='name', many=True,queryset=Interfaces.objects.all())
+
+    # inter = InterfaceSerilizer(label='所属接口信息',help_text='所属接口信息',read_only=True,many=True)
+
+    '''
+    序列化器类添加单字段自定义校验方法
+        1、可以在序列化器类中对单个字段进行校验
+        2、单字段的校验方法名称，必须把validate_作为前缀，加上待校验的字段名，如：validate_待校验的字段名
+        3、如果校验不通过，必须得返回serializers.ValidationError('具体报错信息')异常
+        4、如果校验通过，往往需要将校验之后的值，返回
+        5、如果该字段在定义时添加的校验规则不通过，那么是不会调用单字段的校验方法
+    '''
+    def validate_name(self,attr:str):
+        if not attr.endswith('项目'):
+            raise serializers.ValidationError('项目名称必须得以“项目”结尾')
+        return attr
+
+    '''
+    序列化器类添加多字段自定义校验方法
+        1、可以在序列化器类中对多个字段进行联合校验
+        2、使用固定的validate方法，会接收上面校验通过之后的字典数据
+        3、当所有字段定义时添加的校验规则都通过，且每个字段的单字段校验方法通过的情况下，才会调用validate
+    '''
+    def validate(self,attrs:dict):
+        if len(attrs.get('leader')) <= 4 or not attrs.get('is_execute'):
+            raise serializers.ValidationError('项目负责人名称长度不能少于4位或者is_execute参数为False')
+        return attrs
+

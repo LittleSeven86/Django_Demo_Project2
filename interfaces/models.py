@@ -14,7 +14,7 @@ from utils.base_model import BaseModel
 
 # class Interfaces(models.Model):
 class Interfaces(BaseModel):
-    # id = models.AutoField(primary_key=True, verbose_name='id主键', help_text='id主键')
+    id = models.AutoField(primary_key=True, verbose_name='id主键', help_text='id主键')
     name = models.CharField(verbose_name='接口名称', help_text='接口名称', max_length=20, unique=True)
     tester = models.CharField(verbose_name='测试人员', help_text='测试人员', max_length=10)
     '''
@@ -33,7 +33,7 @@ class Interfaces(BaseModel):
     '''
     # projects = models.ForeignKey(Projects)
     # models.ManyToManyField
-    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE,verbose_name='所属项目', help_text='所属项目',related_name='interfaces_projects')
+    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE,verbose_name='所属项目', help_text='所属项目',related_name='inter')
 
     # create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     # update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')

@@ -103,7 +103,8 @@ class ProjectsView(View):
         6.只有在调用.is_valid()方法之后，才可以使用序列化器对象调用.validated_data属性，来获取校验通过之后的数据，与使用json.load转化之后的数据有区别
         '''
         serializer11 = ProjectSerializer(data=python_data)
-        if not serializer11.is_valid():
+        #     id = serializers.IntegerField(label='项目id', help_text='项目id', max_value=1000, min_value=1)
+        if not serializer11.is_valid(raise_exception=False):
             return JsonResponse(serializer11.errors,status=401)
 
         # 3、创建数据
