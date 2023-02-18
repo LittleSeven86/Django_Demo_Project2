@@ -94,7 +94,21 @@ class ProjectSerializer(serializers.Serializer):
                                  ])
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_null=True)
     # leader = serializers.CharField(label='项目负责人', help_text='项目负责人', allow_blank=True)
-    leader = serializers.CharField(label='项目负责人', help_text='项目负责人', read_only=True)
+    leader = serializers.CharField(label='项目负责人', help_text='项目负责人')
+
+    '''
+    2023 0215
+        1、如果定义了一个模型类中没有的字段，并且该字段需要输出（序列化输出）
+        2、需要在create方法、update方法中的模型对象上，添加动态的属性即可
+    '''
+    token = serializers.CharField(read_only=True)
+
+    '''
+    2023 0215
+        3、如果定义了一个模型类中没有的字段，并且该字段需要输入（反序列化输入）
+        4、需要在create方法、update方法调用之前，将该字段pop调用
+    '''
+    # sms_code = serializers.CharField(write_only=True)
 
     '''
     自定义错误提示，以及日期格式化输出
@@ -159,7 +173,60 @@ class ProjectSerializer(serializers.Serializer):
         3、当所有字段定义时添加的校验规则都通过，且每个字段的单字段校验方法通过的情况下，才会调用validate
     '''
     def validate(self,attrs:dict):
-        if len(attrs.get('leader')) <= 4 or not attrs.get('is_execute'):
-            raise serializers.ValidationError('项目负责人名称长度不能少于4位或者is_execute参数为False')
         return attrs
+
+    def to_internal_value(self, data):
+        '''
+        1、to_internal_value方法，是所有字段开始进行输入校验时入口方法（最先调用的方法）
+        2、会依次对序列化器类的各个序列化器字段进行校验：对字段类型进行校验 -> 依次验证validators列表中的校验规则 -> 从右到左依次验证其他规则 -> 调用单字段校验方法 -> to_internal_value调用结束 -> 调用多字段联合校验方法validate方法
+        3、功能：对各个单字段校验结束之后的数据进行修改
+        '''
+        tmp = super().to_internal_value(data)
+        return tmp
+
+    def to_representation(self, instance):
+        '''
+        1、to_representation方法，是所有字段开始进行序列化输出时的入口方法（最先调用的方法）
+        '''
+        tmp = super().to_representation(instance)
+        tmp['total'] = len(tmp)
+        return tmp
+
+    def create(self, validated_data):
+        project_obj = Projects.objects.create(**validated_data)
+        project_obj.token = 'xxx-xxx'
+        return project_obj
+
+    def update(self, instance, validated_data:dict):
+        instance.name = validated_data.get('name')
+        instance.is_excute = validated_data.get('is_excute')
+        instance.leader = validated_data.get('leader')
+        instance.desc = validated_data.get('desc')
+        instance.save()
+        return instance
+
+
+class ProjectModelSerializer(serializers.ModelSerializer):
+    '''
+    2023 0216
+    定义模型序列化器类
+        1、继承serializers.ModelSerializer类或者其子类
+        2、需要在Meta内部类中指定model、fields、exclude类属性参数
+        3、model指定模型类（需要生成序列化器的模型类）
+        4、fields指定模型类中哪些字段需要自动生成序列化器字段
+            -如果指定为"__all__"，那么模型类中所有的字段都需要自动转化为序列化器字段
+            -可以传递需要转化为序列化器字段的模型字段名元组
+        5、会给id主键、指定了auto_now_add或者auto_now参数的DateTimeField字段，添加read_only=True，仅仅只进行序列化输出
+        6、有设置unique=True的模型字段，会自动在validators列表中添加唯一约束校验<UniqueValidator>
+        7、有设置default=True的模型字段，会自动添加required=False
+        8、有设置null=True的模型字段，会自动添加allow_null=True
+        9、有设置blank=True的模型字段，会自动添加allow_blank=True
+        10、exclude指定模型类中哪些字段不需要转化为序列化器字段，其他的字段都需要转化
+    '''
+    class Meta:
+        model = Projects
+        # fields = '__all__'
+        fields = ('id','name','leader')
+        # exclude = ('create_time','update_time')
+
 

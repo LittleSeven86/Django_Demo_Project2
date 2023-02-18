@@ -102,20 +102,31 @@ class ProjectsView(View):
         5.只有在调用.is_valid()方法之后，才可以使用序列化器对象调用.errors属性，来获取错误提示信息（字典类型）
         6.只有在调用.is_valid()方法之后，才可以使用序列化器对象调用.validated_data属性，来获取校验通过之后的数据，与使用json.load转化之后的数据有区别
         '''
+        '''
+        2023 0215
+            1、如果在创建序列化器对象时，仅传递data参数，使用序列化器对象调用save方法时，会自动调用序列化器类中的create方法
+            2、create方法用于对数据进行创建操作
+            3、序列化器类中的create方法，validated_data参数为校验通过之后的数据（一般字典类型）
+            4、在调用save方法时，可以传递任意的关键字参数，并且会自动合并到validated_data字典中
+            5、create方法一般需要将创建成功之后模型对象返回
+        '''
         serializer11 = ProjectSerializer(data=python_data)
-        #     id = serializers.IntegerField(label='项目id', help_text='项目id', max_value=1000, min_value=1)
         if not serializer11.is_valid(raise_exception=False):
-            return JsonResponse(serializer11.errors,status=401)
+            return JsonResponse(serializer11.errors, status=401)
 
         # 3、创建数据
-        # project_obj = Projects.objects.create(name=python_data.get('name'),
-        #                                       leader=python_data.get('leader'),
-        #                                       is_execute=python_data.get('is_execute'),
-        #                                       desc=python_data.get('desc'))
-        # project_obj = Projects.objects.create(**python_data)
-        project_obj = Projects.objects.create(**serializer11.validated_data)
+        # project_obj = serializer11.save(myname = 'lisa',age = 18)
+        project_obj = serializer11.save()
 
         # 4、将创建成功的数据返回给前端
+        '''
+        2023 0215
+            1、在创建序列化器对象时，仅仅只传递data参数，那么必须得调用is_valid()方法通过之后
+            2、如果没有调用save方法，使用创建序列化器对象.data属性，来获取序列化输出的数据
+              （会把validated_data数据作为输入源，参照序列化器字段的定义来进行输入）
+            3、如果调用了save方法，使用创建序列化器对象.data属性，来获取序列化输出的数据
+              （会把create方法返回的模型对象数据作为输入源，参照序列化器字段的定义来进行输出）
+        '''
         return JsonResponse(serializer11.data, status=201)
 
 
@@ -143,12 +154,6 @@ class ProjectsDetailView(View):
             project_obj = Projects.objects.get(id__exact=pk)
         except Exception as e:
             return JsonResponse({'msg': '参数有误'}, status=400)
-        # 3、将读取的项目数据转化为字典
-        # python_data = {
-        #     'id': project_obj.id,
-        #     'name': project_obj.name,
-        #     'msg': '获取数据成功'
-        # }
         serializer = ProjectSerializer(instance=project_obj)
         return JsonResponse(serializer.data)
 
@@ -168,16 +173,23 @@ class ProjectsDetailView(View):
             return JsonResponse({'msg': '参数有误'}, status=400)
 
         # 需要进行大量的数据校验，且非常复杂
-        serializer11 = ProjectSerializer(data=python_data)
-        if not serializer11.is_valid():
-            return JsonResponse(serializer11.errors, status=401)
+        # serializer11 = ProjectSerializer(data=python_data)
+        '''
+        2023 0215
+            1、如果在创建序列化器对象时，同时instance和data参数，使用序列化器对象调用save方法时，会自动调用序列化器类中的update方法
+            2、update方法用于对数据进行更新操作
+            3、序列化器类中的update方法，instance参数为待更新的模型对象，validated_data参数为校验通过之后的数据（一般字典类型）
+            4、在调用save方法时，可以传递任意的关键字参数，并且会自动合并到validated_data字典中
+            5、update方法一般需要将更新成功之后模型对象返回
+        '''
+        serializer = ProjectSerializer(instance=project_obj, data=python_data)
+
+        if not serializer.is_valid():
+            return JsonResponse(serializer.errors, status=401)
 
         # 4、更新数据
-        project_obj.name = serializer11.validated_data.get('name')
-        project_obj.is_excute = serializer11.validated_data.get('is_excute')
-        project_obj.leader = serializer11.validated_data.get('leader')
-        project_obj.desc = serializer11.validated_data.get('desc')
-        project_obj.save()
+        # project_obj.save()
+        serializer.save()
 
         # 5、将读取的项目数据转化为字典
         serializer = ProjectSerializer(instance=project_obj)
