@@ -1,0 +1,40 @@
+对项目操作的5个接口，有哪些痛点？
+a.代码冗余非常严重，不够简洁
+b.数据校验极为麻烦（往往需要嵌套多级if条件语句），校验逻辑的复用性较差
+c.代码没有统一的规范，代码维护性较差
+d.获取项目列表数据时，有很多功能缺失
+    1）没有提供分页功能
+    2）没有提供过滤功能
+    3）也没有提供排序功能
+
+e.整个项目的痛点
+    1）没有提供认证授权功能
+    2）没有提供限流功能
+    3）传递参数形式单一，只支持json格式的参数，不支持x-www-form-urlencoded
+    4）5个接口无法放在同一个类视图中
+
+
+django restframwork
+一、创建序列化器对象
+ProjectSerilizer(instance=queryset, many=True)
+1、只传递instance参数
+    a.调用is_valid方法会报错
+    b.调用errors、validated_data都会报错
+    c.不能调用save方法
+    d.调用data属性，可以进行序列化输出
+
+2、只传递data参数
+    a.必须得调用is_valid方法开始对数据进行校验
+    b.调用errors、validated_data都不会报错
+    c.调用save方法会自动调用序列化器类的create方法
+    d.调用data属性，可以进行序列化输出
+    （如果有调用save方法并且create方法有返回模型对象的话，那么会把模型对象作为序列化输出的源数据；
+    如果没有调用save方法，那么会把validated_data作为序列化输出的源数据）
+
+3、同时传递instance、data参数
+    a.必须得调用is_valid方法开始对数据进行校验
+    b.调用errors、validated_data都不会报错
+    c.调用save方法会自动调用序列化器类的update方法
+    d.调用data属性，可以进行序列化输出
+    （如果有调用save方法并且update方法有返回模型对象的话，那么会把模型对象作为序列化输出的源数据；
+        如果没有调用save方法，那么会把validated_data作为序列化输出的源数据）

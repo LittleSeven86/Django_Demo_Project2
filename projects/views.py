@@ -2,9 +2,12 @@ import json
 
 from django.http import HttpResponse, JsonResponse
 from django.views import View
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Projects
-from projects.serializers import ProjectSerializer
+from projects.serializers import ProjectSerializer,ProjectModelSerializer
 
 # 在views
 # Create your views here.
@@ -25,8 +28,14 @@ from projects.serializers import ProjectSerializer
 '''
 
 
-class ProjectsView(View):
-
+# class ProjectsView(View):
+class ProjectsView(APIView):
+    '''
+    2023 0218
+    继承APIView父类（Django中View的子类）
+        a.具备View的所有特性
+        b.提供了认证、授权、限流功能
+    '''
     def get(self, request):
         '''
         2、获取所有项目数据
@@ -63,7 +72,7 @@ class ProjectsView(View):
             d.如果传递的是模型对象、普通对象，不需要设置many=True
             e.可以使用序列化器对象的.data属性，获取序列化器之后的数据（字典、嵌套字典的列表）
             '''
-        serializer = ProjectSerializer(instance=queryset, many=True)
+        serializer = ProjectModelSerializer(instance=queryset, many=True)
         # 列表推导式
         # project_list = [{
         #         'id': item.id,
@@ -72,26 +81,25 @@ class ProjectsView(View):
         #     } for item in queryset]
 
         # return JsonResponse(project_list, safe=False)
-        return JsonResponse(serializer.data, safe=False)
+        '''
+        2023 0218 在DRF中Response为HTTPResponse的子类
+            a.data参数为序列化之后的数据（一般为字典或嵌套字典的列表）
+            b.会自动根据渲染器来将数据转化为请求头中Accept需要的格式进行返回
+            c.status指定响应状态码
+            d.content_type指定响应头中的Content-Type，一般无需指定，会根据渲染器来自动设置
+            e.修改headers,可以直接定义字典，一般无需指定
+        '''
+        return Response(serializer.data,status=status.HTTP_200_OK,headers={},content_type='')
 
     def post(self, request):
         '''
-        1、获取json参数并转化为python中的数据类型（字典）
-
-        2、需要进行大量的数据校验（非常麻烦）
-          a.需要校验必传参数是否有传递
-          b.传递的有唯一约束的参数是否已经存在
-          c.必传参数的长度是否超过限制
-          d.校验传参类型
-
-         3、创建数据
-
-         4、将创建成功的数据返回给前端
+        2023 0218
+        a.一旦继承APIView之后，request是DRF中Request对象
+        b.Request是在HttpRequest基础上做了拓展
+        c.兼容HttpRequest的所有功能
+        d.前端传递的查询字符串参数：GET、query_params
+        e.前端传递application/json、application/x-www-form-urlencoded、multipart/form-data参数,可以根据请求头中Content-Type，使用统一的data属性获取
         '''
-        try:
-            python_data = json.loads(request.body)
-        except Exception as e:
-            return JsonResponse({'msg': '参数有误'}, status=400)
 
         '''
         四、反序列化操作
@@ -110,12 +118,10 @@ class ProjectsView(View):
             4、在调用save方法时，可以传递任意的关键字参数，并且会自动合并到validated_data字典中
             5、create方法一般需要将创建成功之后模型对象返回
         '''
-        serializer11 = ProjectSerializer(data=python_data)
-        if not serializer11.is_valid(raise_exception=False):
-            return JsonResponse(serializer11.errors, status=401)
+        serializer11 = ProjectModelSerializer(data=request.data)
+        serializer11.is_valid(raise_exception=True)
 
         # 3、创建数据
-        # project_obj = serializer11.save(myname = 'lisa',age = 18)
         project_obj = serializer11.save()
 
         # 4、将创建成功的数据返回给前端
@@ -127,10 +133,10 @@ class ProjectsView(View):
             3、如果调用了save方法，使用创建序列化器对象.data属性，来获取序列化输出的数据
               （会把create方法返回的模型对象数据作为输入源，参照序列化器字段的定义来进行输出）
         '''
-        return JsonResponse(serializer11.data, status=201)
+        return Response(serializer11.data, status=status.HTTP_201_CREATED)
 
 
-class ProjectsDetailView(View):
+class ProjectsDetailView(APIView):
     """
        1、获取一条项目数据（获取详情数据）
            GET /projects/<int:pk>/
@@ -144,16 +150,23 @@ class ProjectsDetailView(View):
            DELETE /projects/<int:pk>/
            数据校验（规范传入的参数） -> 数据库操作（删除一条项目数据）
        """
+    def get_object(self,pk):
+        try:
+            project_obj = Projects.objects.get(id__exact=pk)
+            return project_obj
+        except Exception as e:
+            return Response({'msg': '参数有误'}, status=400)
 
     def get(self, request, pk):
         '''
         1、需要校验pk在数据库中是否存在
         2、从数据库中读取项目数据
         '''
-        try:
-            project_obj = Projects.objects.get(id__exact=pk)
-        except Exception as e:
-            return JsonResponse({'msg': '参数有误'}, status=400)
+        # try:
+        #     project_obj = Projects.objects.get(id__exact=pk)
+        # except Exception as e:
+        #     return JsonResponse({'msg': '参数有误'}, status=400)
+        project_obj = self.get_object(pk)
         serializer = ProjectSerializer(instance=project_obj)
         return JsonResponse(serializer.data)
 
@@ -162,18 +175,8 @@ class ProjectsDetailView(View):
         1、需要校验pk在数据库中是否存在
         2、从数据库中读取项目数据
         '''
-        try:
-            project_obj = Projects.objects.get(id__exact=pk)
-        except Exception as e:
-            return JsonResponse({'msg': '数据有误'}, status=400)
-        # 3、获取json参数并转化为python中的数据类型（字典）
-        try:
-            python_data = json.loads(request.body)
-        except Exception as e:
-            return JsonResponse({'msg': '参数有误'}, status=400)
+        project_obj = self.get_object(pk)
 
-        # 需要进行大量的数据校验，且非常复杂
-        # serializer11 = ProjectSerializer(data=python_data)
         '''
         2023 0215
             1、如果在创建序列化器对象时，同时instance和data参数，使用序列化器对象调用save方法时，会自动调用序列化器类中的update方法
@@ -182,13 +185,14 @@ class ProjectsDetailView(View):
             4、在调用save方法时，可以传递任意的关键字参数，并且会自动合并到validated_data字典中
             5、update方法一般需要将更新成功之后模型对象返回
         '''
-        serializer = ProjectSerializer(instance=project_obj, data=python_data)
+        serializer = ProjectSerializer(instance=project_obj, data=request.data)
 
-        if not serializer.is_valid():
-            return JsonResponse(serializer.errors, status=401)
+        # if not serializer.is_valid():
+        #     return JsonResponse(serializer.errors, status=401)
+        # 在序列化器对象调用is_valid(raise_exception=True)，校验失败时，会抛出异常，DRF框架会自动处理异常
+        serializer.is_valid(raise_exception=True)
 
         # 4、更新数据
-        # project_obj.save()
         serializer.save()
 
         # 5、将读取的项目数据转化为字典
