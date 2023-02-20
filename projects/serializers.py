@@ -277,8 +277,8 @@ class ProjectModelSerializer(serializers.ModelSerializer):
         b.一般无需再次定义create和update方法
         c.如果父类提供的create和update方法不满足需要时，可以重写create和update方法，最后再调用父类的create和update方法
         '''
-        validated_data.pop('myname')
-        validated_data.pop('age')
+        # validated_data.pop('myname')
+        # validated_data.pop('age')
         instance = super().create(validated_data)
         instance.token = 'xxxxx'
         return instance

@@ -140,9 +140,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 '''
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
-            'rest_framework.parsers.JSONParser',
-            'rest_framework.parsers.FormParser',
-            'rest_framework.parsers.MultiPartParser',
+            # 'rest_framework.parsers.JSONParser',
+            # 'rest_framework.parsers.FormParser',
+            # 'rest_framework.parsers.MultiPartParser',
         ],
     '''
     2023 0218 DRF中的渲染器（类）
@@ -157,4 +157,12 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         # 'rest_framework.renderers.BrowsableAPIRenderer',
     ],
+    # 1、在全局DEFAULT_FILTER_BACKENDS指定使用的过滤引擎类（SearchFilter为搜索引擎类）
+    # 2、可以在全局使用SEARCH_PARAM修改前端过滤查询字符串参数名称（默认为search）
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter','rest_framework.filters.OrderingFilter'],
+
+    # 'SEARCH_PARAM': 'se',
+    # 'ORDERING_PARAM': 'ordering',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 4,
 }
