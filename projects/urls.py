@@ -7,6 +7,8 @@
 
 from django.urls import path
 from projects import views
+from . import views
+
 
 urlpatterns = [
     # path('get/', views.get_project),
@@ -15,6 +17,17 @@ urlpatterns = [
     # path('delete/',views.delete_project)
     # 定义类试图的路由条目
     # 类型图.as_view() 进行调用
-    path('projects/',views.ProjectsView.as_view()),
-    path('projects/<int:pk>/',views.ProjectsDetailView.as_view())
+    # path('projects/',views.ProjectsView.as_view()),
+    path('projects/',views.ProjectViewSet.as_view({
+        'get':'list',
+        'post':'create'
+    })),
+    # path('projects/<int:pk>/',views.ProjectsDetailView.as_view()),
+    path('projects/<int:pk>/',views.ProjectViewSet.as_view({
+        'get':'retrieve',
+        'put':'update',
+        'patch':'partial_update',
+        'dalete':'destroy'
+    })),
+
 ]

@@ -163,6 +163,10 @@ REST_FRAMEWORK = {
 
     # 'SEARCH_PARAM': 'se',
     # 'ORDERING_PARAM': 'ordering',
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 4,
+
+    # 1、在全局settings.py文件，DEFAULT_PAGINATION_CLASS上指定分页引擎类PageNumberPagination
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'utils.pagination.PageNumberPagination',
+    # 2、指定每一页显示的数据条数
+    'PAGE_SIZE': 3,
 }
