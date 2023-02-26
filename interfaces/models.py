@@ -33,7 +33,7 @@ class Interfaces(BaseModel):
     '''
     # projects = models.ForeignKey(Projects)
     # models.ManyToManyField
-    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE,verbose_name='所属项目', help_text='所属项目',related_name='inter')
+    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE,verbose_name='所属项目', help_text='所属项目')
 
     # create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     # update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')

@@ -169,4 +169,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'utils.pagination.PageNumberPagination',
     # 2、指定每一页显示的数据条数
     'PAGE_SIZE': 3,
+    # 指定用于支持coreapi的Schema
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
 }
+
+

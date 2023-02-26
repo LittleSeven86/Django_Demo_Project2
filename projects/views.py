@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.parsers import JSONParser
 
 from .models import Projects
 from projects.serializers import ProjectSerializer, ProjectModelSerializer
@@ -142,12 +144,28 @@ class ProjectsDetailView(generics.RetrieveUpdateDestroyAPIView):
 #     mixins.UpdateModelMixin,
 #     mixins.DestroyModelMixin,
 #     viewsets.GenericViewSet):
+
+'''
+a.ModelViewSet是一个最完整的视图集类
+b.提供了获取列表数据接口、获取详情数据接口、创建数据接口、更新数据接口、删除数据的接口
+c.如果需要对某个模型进行增删改查操作，才会选择ModelViewSet
+d.如果仅仅只对某个模型进行数据读取操作（取列表数据接口、获取详情数据接口），一般会选择ReadOnlyModelViewSet
+'''
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    定义视图集
+    list:
+    获取项目列表数据
+
+    retrieve:
+    获取项目详情数据
+
+    update:
+    更新项目数据
+
+    names:
+    获取项目名称
+
     """
-    queryset = Projects.objects.all()
-    serializer_class = ProjectSerializer
 
     # def list(self, request, *args, **kwargs):
     #     pass
@@ -166,3 +184,41 @@ class ProjectViewSet(viewsets.ModelViewSet):
     #
     # def destroy(self, request, *args, **kwargs):
     #     pass
+    parser_classes = [JSONParser]
+    queryset = Projects.objects.all()
+    serializer_class = ProjectModelSerializer
+
+    '''
+    1、如果需要使用路由器机制自动生成路由条目，那么就必须得使用action装饰器
+    2、methods指定需要使用的请求方法，如果不指定，默认为GET
+    3、detail指定是否为详情接口，是否需要传递当前模型的pk值,
+      -如果需要传递当前模型的pk值，那么detail=True，否则detail=False
+    4、url_path指定url路径，默认为action方法名称
+    5、url_name指定url路由条目名称后缀，默认为action方法名称
+    @action(methods=['GET'], detail=False, url_path='xxx', url_name='yyyy')
+    '''
+    # @action(methods=['GET'],detail=False,url_path='xxx',url_name='yyy')
+    @action(methods=['GET'],detail=False,)
+    def names(self,request,*args,**kwargs):
+        queryset = self.get_queryset()
+        name_list = []
+        for project in queryset:
+            name_list.append({
+                'id':project.id,
+                'name':project.name
+            })
+        return Response(name_list,status=200)
+
+    @action(detail=True)
+    def interfaces(self,requeset,*args,**kwargs):
+        project = self.get_object()
+        interfaces_qs = project.interfaces_set.all()
+        interfaces_data = [{'id': interface.id, 'name': interface.name} for interface in interfaces_qs]
+        return Response(interfaces_data,status=200)
+
+    def get_serializer_class(self):
+        # print(ProjectModelSerializer.__mro__)
+        if self.action == 'retrieve':
+            return ProjectModelSerializer
+        else:
+            return super().get_serializer_class()

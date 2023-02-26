@@ -194,7 +194,7 @@ class ProjectSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         project_obj = Projects.objects.create(**validated_data)
-        project_obj.token = 'xxx-xxx'
+        # project_obj.token = 'xxx-xxx'
         return project_obj
 
     def update(self, instance, validated_data:dict):
@@ -240,8 +240,8 @@ class ProjectModelSerializer(serializers.ModelSerializer):
                                      is_contains_keyword,
 
                                  ])
-    inter = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-    token = serializers.CharField(read_only=True)
+    # inter = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    # token = serializers.CharField(read_only=True)
 
     '''
     2023 0218
@@ -262,12 +262,12 @@ class ProjectModelSerializer(serializers.ModelSerializer):
         }
     }
     # 可以将需要批量需要设置read_only=True参数的字段名添加到Meta中read_only_fields元组
-    read_only_fields = ('leader','is_excute','id')
+    # read_only_fields = ('leader','is_excute','id')
 
     class Meta:
         model = Projects
-        # fields = '__all__'
-        fields = ('id','name','leader','inter','token')
+        fields = '__all__'
+        # fields = ('id','name','leader',)
         # exclude = ('create_time','update_time')
         
     def create(self, validated_data):
@@ -280,6 +280,84 @@ class ProjectModelSerializer(serializers.ModelSerializer):
         # validated_data.pop('myname')
         # validated_data.pop('age')
         instance = super().create(validated_data)
-        instance.token = 'xxxxx'
+        # instance.token = 'xxxxx'
         return instance
 
+
+class ProjectModelSerializer1(serializers.ModelSerializer):
+    '''
+    2023 0216
+    定义模型序列化器类
+        1、继承serializers.ModelSerializer类或者其子类
+        2、需要在Meta内部类中指定model、fields、exclude类属性参数
+        3、model指定模型类（需要生成序列化器的模型类）
+        4、fields指定模型类中哪些字段需要自动生成序列化器字段
+            -如果指定为"__all__"，那么模型类中所有的字段都需要自动转化为序列化器字段
+            -可以传递需要转化为序列化器字段的模型字段名元组
+        5、会给id主键、指定了auto_now_add或者auto_now参数的DateTimeField字段，添加read_only=True，仅仅只进行序列化输出
+        6、有设置unique=True的模型字段，会自动在validators列表中添加唯一约束校验<UniqueValidator>
+        7、有设置default=True的模型字段，会自动添加required=False
+        8、有设置null=True的模型字段，会自动添加allow_null=True
+        9、有设置blank=True的模型字段，会自动添加allow_blank=True
+        10、exclude指定模型类中哪些字段不需要转化为序列化器字段，其他的字段都需要转化
+    '''
+    '''
+    2023 0218 修改自动生成的序列化器字段
+    方式一：
+        可以重新定义模型类中同名的字段
+        自定义字段的优先级会更高（会覆盖自动生成的序列化器字段）
+        fields元祖中必须指定进行序列化或者反序列化操作的所有字段名称，指定了'__all__'和exclude除外
+    '''
+    name = serializers.CharField(label='项目名称', help_text='项目名称', max_length=20, min_length=5,
+                                 error_messages={
+                                     'min_length': '项目名称不能少于5位',
+                                     'max_length': '项目名称不能超过20位'
+                                 },
+                                 validators=[
+                                     UniqueValidator(queryset=Projects.objects.all(), message='项目名称不能重复'),
+                                     is_contains_keyword,
+
+                                 ])
+    # inter = serializers.PrimaryKeyRelatedField(many=True,read_only=True)
+    # token = serializers.CharField(read_only=True)
+
+    '''
+    2023 0218
+    方式二：
+        a.如果自动生成的序列化器字段，只有少量不满足要求，可以在Meta中extra_kwargs字典进行微调
+        b.将需要调整的字段作为key，把具体需要修改的内容字典作为value
+    '''
+    extra_kwargs = {
+        'leader': {
+            'label': '负责人',
+            'max_length': 15,
+            'min_length': 2,
+            'read_only': True,
+            'validators': []
+        },
+        'name': {
+            'min_length': 5
+        }
+    }
+
+    # 可以将需要批量需要设置read_only=True参数的字段名添加到Meta中read_only_fields元组
+    # read_only_fields = ('leader','is_excute','id')
+
+    class Meta:
+        model = Projects
+        fields = '__all__'
+        # fields = ('id','name','leader',)
+        # exclude = ('create_time','update_time')
+
+    def create(self, validated_data):
+        '''
+        2023 0218
+        a.继承ModelSerializer之后，ModelSerializer中实现了create和update方法
+        b.一般无需再次定义create和update方法
+        c.如果父类提供的create和update方法不满足需要时，可以重写create和update方法，最后再调用父类的create和update方法
+        '''
+        # validated_data.pop('myname')
+        # validated_data.pop('age')
+        instance = super().create(validated_data)
+        # instance.token = 'xxxxx'
+        return instance
