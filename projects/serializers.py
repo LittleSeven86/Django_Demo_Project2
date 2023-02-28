@@ -361,3 +361,8 @@ class ProjectModelSerializer1(serializers.ModelSerializer):
         instance = super().create(validated_data)
         # instance.token = 'xxxxx'
         return instance
+
+class ProjectNamesModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        fields = ('id','name')

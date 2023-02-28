@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser
 
 from .models import Projects
-from projects.serializers import ProjectSerializer, ProjectModelSerializer
+from projects.serializers import ProjectSerializer, ProjectModelSerializer,ProjectNamesModelSerializer
 from utils.pagination import PageNumberPagination
 
 # 在views
@@ -187,6 +187,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     parser_classes = [JSONParser]
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'leader', 'id']
+    ordering_fields = ['id', 'name']
+    # 可以在类视图中指定分页引擎类，优先级高于全局
+    pagination_class = PageNumberPagination
 
     '''
     1、如果需要使用路由器机制自动生成路由条目，那么就必须得使用action装饰器
@@ -200,15 +205,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
     # @action(methods=['GET'],detail=False,url_path='xxx',url_name='yyy')
     @action(methods=['GET'],detail=False,)
     def names(self,request,*args,**kwargs):
-        queryset = self.get_queryset()
-        name_list = []
-        for project in queryset:
-            name_list.append({
-                'id':project.id,
-                'name':project.name
-            })
-        return Response(name_list,status=200)
-
+        # queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
+        # name_list = []
+        # for project in queryset:
+        #     name_list.append({
+        #         'id':project.id,
+        #         'name':project.name
+        #     })
+        serializer = self.get_serializer(queryset,many = True)
+        # return Response(serializer.data,status=200)
+        return super().list(request,*args,**kwargs)
+    
     @action(detail=True)
     def interfaces(self,requeset,*args,**kwargs):
         project = self.get_object()
@@ -217,8 +225,45 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(interfaces_data,status=200)
 
     def get_serializer_class(self):
+        '''
+        a.可以重写父类的get_serializer_class方法，用于为不同的action提供不一样的序列化器类
+        b.在视图集对象中可以使用action属性获取当前访问的action方法名称
+        '''
         # print(ProjectModelSerializer.__mro__)
-        if self.action == 'retrieve':
-            return ProjectModelSerializer
+        if self.action == 'names':
+            return ProjectNamesModelSerializer
         else:
             return super().get_serializer_class()
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        response.data.pop('id')
+        response.data.pop('create_time')
+        return response
+
+    # def filter_queryset(self, queryset):
+    #     if self.action =='names':
+    #         return self.queryset
+    #     else:
+    #         return super().filter_queryset(queryset)
+
+    def paginator_queryset(self,queryset):
+        if self.action =='names':
+            return
+        else:
+            return super().paginate_queryset(queryset)
+
+    # def get_queryset(self):
+    #     if self.action =='names':
+    #         return self.queryset.filter(name__icontains='2')
+    #     else:
+    #         return super().get_queryset()
+
+'''
+如何定义类视图？类视图的设计原则？
+    a.类视图尽量要简单
+    b.根据需求选择相应的父类视图
+    c.如果DRF中的类视图有提供相应的逻辑，那么就直接使用父类提供的
+    d.如果DRF中的类视图，绝大多数逻辑都能满足需求，可以重写父类实现
+    e.如果DRF中的类视图完全不满足要求，那么就直接自定义即可
+'''
