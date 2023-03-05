@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'drf_yasg',
     'projects.apps.ProjectsConfig',
     'interfaces',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -143,9 +145,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 '''
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
-            # 'rest_framework.parsers.JSONParser',
-            # 'rest_framework.parsers.FormParser',
-            # 'rest_framework.parsers.MultiPartParser',
+            'rest_framework.parsers.JSONParser',
+            'rest_framework.parsers.FormParser',
+            'rest_framework.parsers.MultiPartParser',
         ],
     '''
     2023 0218 DRF中的渲染器（类）
@@ -158,7 +160,7 @@ REST_FRAMEWORK = {
     '''
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        # 'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     # 1、在全局DEFAULT_FILTER_BACKENDS指定使用的过滤引擎类（SearchFilter为搜索引擎类）
     # 2、可以在全局使用SEARCH_PARAM修改前端过滤查询字符串参数名称（默认为search）
@@ -177,9 +179,14 @@ REST_FRAMEWORK = {
     # 指定使用的认证类
     # a.在全局指定默认的认证类（指定认证方式）
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 1）指定使用JWT TOKEN认证类
+        # 2）在全局路由表中添加obtain_jwt_token路由（可以使用用户名和密码进行认证）
+        # 3）认证通过之后，在响应体中会返回token值
+        # 4）将token值设置请求头参数，key为Authorization，value为JWT token值
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         # b.Session会话认证
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication'
+        'rest_framework.authentication.BasicAuthentication',
     ],
     # 指定使用的权限类
     # a.在全局指定默认的权限类（当认证通过之后，可以获取何种权限）
@@ -245,3 +252,5 @@ LOGGING = {
     }
 }
 
+# 指定使用的用户模型类，默认为auth子应用下的User
+# AUTH_USER_MODEL = "users.UserModel"

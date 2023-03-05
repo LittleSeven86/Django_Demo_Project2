@@ -18,6 +18,7 @@ from django.urls import path, include, re_path
 from projects import views
 from projects import urls
 from rest_framework.documentation import include_docs_urls
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 '''
 一、什么是路由？
@@ -73,5 +74,6 @@ urlpatterns = [
 
     # 在全局路由表中添加rest_framework.urls子路由
     # a.rest_framework.urls提供了登录和登出功能（返回的是一个HTML页面，并不是接口）
-    path('api/',include('rest_framework.urls'))
+    path('api/',include('rest_framework.urls')),
+    path('users/login/', TokenObtainPairView.as_view()),
 ]
