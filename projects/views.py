@@ -1,4 +1,4 @@
-import json
+import json,logging
 
 from django.http import JsonResponse
 from rest_framework import status, filters
@@ -14,6 +14,10 @@ from rest_framework.parsers import JSONParser
 from .models import Projects
 from projects.serializers import ProjectSerializer, ProjectModelSerializer,ProjectNamesModelSerializer
 from utils.pagination import PageNumberPagination
+
+
+
+logger = logging.getLogger('Demo1_1')
 
 # 在views
 # Create your views here.
@@ -214,14 +218,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         #         'name':project.name
         #     })
         serializer = self.get_serializer(queryset,many = True)
+
         # return Response(serializer.data,status=200)
-        return super().list(request,*args,**kwargs)
+        response = super().list(request,*args,**kwargs)
+        logger.info(response.data)
+        return response
     
     @action(detail=True)
     def interfaces(self,requeset,*args,**kwargs):
         project = self.get_object()
         interfaces_qs = project.interfaces_set.all()
         interfaces_data = [{'id': interface.id, 'name': interface.name} for interface in interfaces_qs]
+
+        logger.debug(interfaces_data)
         return Response(interfaces_data,status=200)
 
     def get_serializer_class(self):
@@ -253,11 +262,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         else:
             return super().paginate_queryset(queryset)
 
-    # def get_queryset(self):
-    #     if self.action =='names':
-    #         return self.queryset.filter(name__icontains='2')
-    #     else:
-    #         return super().get_queryset()
+    def get_queryset(self):
+        if self.action =='names':
+            return self.queryset.filter(name__icontains='2')
+        else:
+            return super().get_queryset()
 
 '''
 如何定义类视图？类视图的设计原则？
@@ -266,4 +275,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     c.如果DRF中的类视图有提供相应的逻辑，那么就直接使用父类提供的
     d.如果DRF中的类视图，绝大多数逻辑都能满足需求，可以重写父类实现
     e.如果DRF中的类视图完全不满足要求，那么就直接自定义即可
+'''
+
+'''
+认证与授权
+1、认证：获取权限的方式
+2、授权：通过认证之后，可以获取哪些特权
 '''

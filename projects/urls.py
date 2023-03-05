@@ -15,9 +15,9 @@ from rest_framework import routers
 2、路由器对象默认只为通用action（create、list、retrieve、update、destroy）生成路由条目，自定义的action不会生成路由条目
 3、创建SimpleRouter路由对象
 '''
-# router = routers.SimpleRouter()
+router = routers.SimpleRouter()
 # DefaultRouter与SimpleRouter功能类似，仅有的区别为：DefaultRouter会自动生成一个根路由（显示获取数据的入口）
-router = routers.DefaultRouter()
+# router = routers.DefaultRouter()
 '''
 4、使用路由器对象调用register方法进行注册
 5、prefix指定路由前缀
