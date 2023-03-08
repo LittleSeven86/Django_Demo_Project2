@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-import os
+import os, datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,20 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'corsheaders',
     'drf_yasg',
     'projects.apps.ProjectsConfig',
     'interfaces',
-    'users'
+    'users',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 需要添加在CommonMiddleware中间件之前
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'Demo1_1.urls'
@@ -145,10 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 '''
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
-            'rest_framework.parsers.JSONParser',
-            'rest_framework.parsers.FormParser',
-            'rest_framework.parsers.MultiPartParser',
-        ],
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
     '''
     2023 0218 DRF中的渲染器（类）
         1、可以根据请求头中的Accept参数来自动渲染前端需要的数据格式
@@ -164,7 +168,7 @@ REST_FRAMEWORK = {
     ],
     # 1、在全局DEFAULT_FILTER_BACKENDS指定使用的过滤引擎类（SearchFilter为搜索引擎类）
     # 2、可以在全局使用SEARCH_PARAM修改前端过滤查询字符串参数名称（默认为search）
-    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter','rest_framework.filters.OrderingFilter'],
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter'],
 
     # 'SEARCH_PARAM': 'se',
     # 'ORDERING_PARAM': 'ordering',
@@ -235,10 +239,10 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, "logs/mytest.log"),  # 日志文件的位置
-            'maxBytes': 100 * 1024 * 1024,      # 表示单日志文件最大100mb,超过100MB会创建新的文件
+            'maxBytes': 100 * 1024 * 1024,  # 表示单日志文件最大100mb,超过100MB会创建新的文件
             'backupCount': 10,  # 表示最多存放10个日志文件
             'formatter': 'verbose',
-            'encoding': 'utf-8' # 将日志中文编码换成 utf-8，不然中文会乱码
+            'encoding': 'utf-8'  # 将日志中文编码换成 utf-8，不然中文会乱码
         },
     },
     # 定义日志器
@@ -254,3 +258,20 @@ LOGGING = {
 
 # 指定使用的用户模型类，默认为auth子应用下的User
 # AUTH_USER_MODEL = "users.UserModel"
+
+SIMPLE_JWT = {
+    # token有效时长(返回的 access 有效时长)
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
+    # token刷新的有效时间(返回的 refresh 有效时长)
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(seconds=20),
+}
+# CORS_ORIGIN_ALLOW_ALL  为True，指定所有域名(ip)都可以访问后端接口，默认为False
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_WHITELIST指定能够访问后端接口的ip或域名列表
+# CORS_ORIGIN_WHITELIST =[
+#     'http://127.0.0.1:8000'
+# ]
+
+# 允许跨域事携带Cookie，默认为Fasle
+# CORS_ALLOW_CREDENTIALS= True

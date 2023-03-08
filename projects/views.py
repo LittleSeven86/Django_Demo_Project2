@@ -194,9 +194,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'leader', 'id']
     ordering_fields = ['id', 'name']
-    # 可以在类视图中指定分页引擎类，优先级高于全局
-    pagination_class = PageNumberPagination
+    # # 可以在类视图中指定分页引擎类，优先级高于全局
+    # pagination_class = PageNumberPagination
+    # # 在继承了APIView的类视图中，可以使用permission_classes类属性指定权限类，值为列表，可添加多个权限类
+    # permission_classes = [permissions.IsAuthenticated]
 
+    # 在继承了APIView的类视图中，可以使用authentication_classes类属性指定认证类，值为列表，可添加多个认证类
+    # 优秀级高于全局，一般无需在特定类视图中指定
+    # authentication_classes = []
     '''
     1、如果需要使用路由器机制自动生成路由条目，那么就必须得使用action装饰器
     2、methods指定需要使用的请求方法，如果不指定，默认为GET
