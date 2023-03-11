@@ -1,0 +1,48 @@
+# 一、YAML配置文件的格式
+# 1、yaml是数据格式，不是数据类型（结构）
+# 2、yaml配置文件的后缀为.yml或者.yaml
+# 3、yaml中使用#作为注释，注释只能在某一行的前后，不能与key\value在同一行
+# 4、yaml中有两种结构，一种是key: value，value与冒号之间必须有空格
+#   另一种是 - key: value，“-”为列表结构
+# 5、yaml文件中嵌套的同一级条目前缩进必须一致（一般缩进2个空格）
+# 6、yaml中如果value使用引号（单引号或者双引号），那么该value为字符串类型
+# 7、如果value中只要有字母，哪怕没有添加引号，一般也会识别为字符串类型（false、true、on、off、null除外）
+# 8、value为false、true、on、off，是布尔类型，null为空
+# 9、value中为纯数字或者小数，会被识别为int或float类型
+
+# 二、HttpRunner yaml用例创建
+# 1、name指定当前用例名称
+name: '登录api接口'
+
+# 2、variables设置变量
+#variables:
+#    var1: value1
+#    var2: value2
+
+# 3、request定义当前接口的配置信息
+request:
+    # 4、指定当前接口的url地址
+    url: "http://127.0.0.1:8000/user/login/"
+
+    # 5、method指定当前接口的请求方法名称
+    #   a.请求方法有：GET、POST、PUT、DELETE、PATCH
+    #   b.不区分大小写
+    method: POST
+
+    # 6、headers指定请求头参数
+    headers:
+        Content-Type: "application/json"
+
+    # 7、json指定请求体为json格式的参数
+    json:
+        username: "keyou1"
+        password: "123456"
+
+# 8、validate指定断言
+validate:
+    - eq: ["status_code", 200]
+
+
+# 9、运行用例
+#   a.hrun yaml用例（json用例）文件的绝对路径或者相对路径（推荐） 其他参数
+#   b.通过python程序执行aml用例（json用例）文件

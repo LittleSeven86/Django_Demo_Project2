@@ -10,6 +10,3 @@
 '''
 
 
-
-def get_token(cls, user):
-    return cls.token_class.for_user(user)
