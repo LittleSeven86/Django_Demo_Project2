@@ -199,7 +199,7 @@ REST_FRAMEWORK = {
         # IsAdminUser管理员（管理员需要登录）具备所有权限
         # IsAuthenticated只要登录，就具备所有权限
         # IsAuthenticatedOrReadOnly，如果登录了就具备所有权限，不登录只具备读取数据的权限
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
 
