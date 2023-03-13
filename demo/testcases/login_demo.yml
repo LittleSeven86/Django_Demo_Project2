@@ -1,5 +1,6 @@
 config:
     name: "这是测试报告"
+    verify: False
 
 
 teststeps:
@@ -7,11 +8,20 @@ teststeps:
     name: '测试登录接口'
     request:
         method: post
+        headers:
+            Content-Type: "application/x-www-form-urlencoded"
+
         url: http://127.0.0.1:8000/user/login/
         body:
             username: 'LittleSeven'
             password: 'zm123456'
 
     validate:
-        - eq: ["status_code", 200]
+#        - eq: ["status_code", 200]
+#        - ge: ['status_code',100]
+#        - contains: ['json','username']
+#        - lt: ["json.user_id", 2]
+        - check: json.user_id
+          assert: lt
+          expect: 2
 

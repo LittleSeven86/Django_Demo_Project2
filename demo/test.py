@@ -10,6 +10,5 @@
 '''
 from httprunner import HttpRunner
 
-httprun = HttpRunner()
-httprun.runpath('/Users/z.m/pythonProject/Demo_one/demo/testcases/login_demo.yml')
+
 
