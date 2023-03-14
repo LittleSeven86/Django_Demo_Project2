@@ -178,11 +178,11 @@
 <table id="summary">
     <tr>
         <th>START AT</th>
-        <td colspan="4">2023-03-13 21:12:03.760163 &#43;0800 CST m=&#43;0.005056584</td>
+        <td colspan="4">2023-03-14 22:24:05.832718 &#43;0800 CST m=&#43;0.002991668</td>
     </tr>
     <tr>
         <th>DURATION</th>
-        <td colspan="4">0.217884542 seconds</td>
+        <td colspan="4">0.21554225 seconds</td>
     </tr>
     <tr>
         <th>PLATFORM</th>
@@ -222,7 +222,7 @@
     <tr id="record_0_0">
         <th class=success style="width:5em;">success</th>
         <td colspan="2">测试登录接口</td>
-        <td style="text-align:center;width:6em;">59 ms</td>
+        <td style="text-align:center;width:6em;">58 ms</td>
         <td class="detail">
             <a class="button" href="#popup_log_0_0">log</a>
             <div id="popup_log_0_0" class="overlay">
@@ -255,7 +255,7 @@
                                 <tr>
                                     <th>url</th>
                                     <td align="left">
-                                        <pre>http://127.0.0.1:8000/user/login/</pre>
+                                        <pre>${ENV(BASE_URL)}/user/login/</pre>
                                     </td>
                                 </tr>
                             </table>
@@ -267,7 +267,7 @@
                                     <th>body</th>
                                     <td align="left">
                                         <pre>{
-    &#34;token&#34;: &#34;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6IkxpdHRsZVNldmVuIiwiZXhwIjoxNjc4NzEzNDIzLCJlbWFpbCI6IkxpdHRsZUBxcS5jb20ifQ.iGuZowoQrdK0Tcqdy74gYHm-OaP_rdHpwK42panuzdw&#34;
+    &#34;token&#34;: &#34;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6IkxpdHRsZVNldmVuIiwiZXhwIjoxNjc4ODA0MTQ2LCJlbWFpbCI6IkxpdHRsZUBxcS5jb20ifQ.ltj05kdUDpDoJZgFLrbL2nn3qL6eYpdipG1Y6snXRe4&#34;
 }</pre>
                                     </td>
                                 </tr>
@@ -283,7 +283,7 @@
                                         <pre>Content-Length: 199</pre>
                                         <pre>Content-Type: application/json</pre>
                                         <pre>Cross-Origin-Opener-Policy: same-origin</pre>
-                                        <pre>Date: Mon, 13 Mar 2023 13:12:03 GMT</pre>
+                                        <pre>Date: Tue, 14 Mar 2023 14:24:06 GMT</pre>
                                         <pre>Referrer-Policy: same-origin</pre>
                                         <pre>Server: WSGIServer/0.2 CPython/3.10.7</pre>
                                         <pre>Vary: Accept, Origin</pre>
@@ -323,6 +323,14 @@
                                     <td>200</td>
                                     <td>200</td>
                                 </tr>
+                                <tr>
+                                    <td class="passed">
+                                        status_code
+                                    </td>
+                                    <td>eq</td>
+                                    <td>200</td>
+                                    <td>200</td>
+                                </tr>
                             </table>
 
                             <h3>Statistics:</h3>
@@ -334,11 +342,11 @@
                                     </tr>
                                     <tr>
                                         <th>response_time(ms)</th>
-                                        <td>59</td>
+                                        <td>58</td>
                                     </tr>
                                     <tr>
                                         <th>elapsed(ms)</th>
-                                        <td>59</td>
+                                        <td>58</td>
                                     </tr>
                                 </table>
                             </div>
