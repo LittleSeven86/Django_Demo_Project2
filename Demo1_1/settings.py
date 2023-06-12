@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-import os, datetime
+import os, datetime,sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# apps 绝对路径
+sys.path.insert(0,os.path.join(BASE_DIR,'apps'))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -44,6 +48,11 @@ INSTALLED_APPS = [
     'projects.apps.ProjectsConfig',
     'interfaces',
     'users',
+    'testcases',
+    'configures',
+    'debugtalks',
+    'envs',
+    'testsuites',
 ]
 
 MIDDLEWARE = [
@@ -89,15 +98,16 @@ DATABASES = {
     # 指定的是Django默认使用的数据库
     'default': {
         # 指定当前使用的数据库引擎
-        # django.db.background.mysql\oracle\sqllite3
-        'ENGINE': 'django.db.backends.sqlite3',
+        # django.db.backends.mysql\oracle\sqllite3
+        'ENGINE': 'django.db.backends.mysql',
         # 指定数据库名称，如果使用的是sqllite3，需要指定sqllite3文件的绝对路径
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': 'Django_Project',
         # 'NAME':'mydb',
-        # 'USER':'root',
-        # 'PASSWORD':'123456',
-        # 'PORT':3306,
-        # 'HOST':'127.0.0.1'
+        'USER':'root',
+        'PASSWORD':'Admin123@qwe',
+        'PORT':3306,
+        'HOST':'106.52.213.128'
     }
 }
 
@@ -134,6 +144,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+# 指定用于收集静态文件的路径
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -199,7 +211,7 @@ REST_FRAMEWORK = {
         # IsAdminUser管理员（管理员需要登录）具备所有权限
         # IsAuthenticated只要登录，就具备所有权限
         # IsAuthenticatedOrReadOnly，如果登录了就具备所有权限，不登录只具备读取数据的权限
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
@@ -259,12 +271,12 @@ LOGGING = {
 # 指定使用的用户模型类，默认为auth子应用下的User
 # AUTH_USER_MODEL = "users.UserModel"
 
-SIMPLE_JWT = {
-    # token有效时长(返回的 access 有效时长)
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
-    # token刷新的有效时间(返回的 refresh 有效时长)
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(seconds=20),
-}
+# SIMPLE_JWT = {
+#     # token有效时长(返回的 access 有效时长)
+#     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
+#     # token刷新的有效时间(返回的 refresh 有效时长)
+#     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(seconds=20),
+# }
 # CORS_ORIGIN_ALLOW_ALL  为True，指定所有域名(ip)都可以访问后端接口，默认为False
 CORS_ORIGIN_ALLOW_ALL = True
 
